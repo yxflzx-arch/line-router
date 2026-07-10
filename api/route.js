@@ -1,3 +1,5 @@
+let count = 0;
+
 export default function handler(req, res) {
 
   const lines = [
@@ -5,22 +7,10 @@ export default function handler(req, res) {
     "你的LINE_B連結"
   ];
 
-  const key = "line_counter";
-
-  let count = Number(req.cookies[key] || 0);
-
-  const target = lines[count % lines.length];
+  const target = lines[count % 2];
 
   count++;
 
-  res.setHeader(
-    "Set-Cookie",
-    `${key}=${count}; Path=/; Max-Age=31536000`
-  );
+  res.redirect(302, target);
 
-  res.writeHead(302, {
-    Location: target
-  });
-
-  res.end();
 }
