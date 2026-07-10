@@ -1,16 +1,11 @@
-let count = 0;
-
 export default function handler(req, res) {
 
-  const lines = [
-    "你的LINE_A連結",
-    "你的LINE_B連結"
-  ];
+  const target = "https://www.google.com";
 
-  const target = lines[count % 2];
+  res.writeHead(302, {
+    Location: target
+  });
 
-  count++;
-
-  res.redirect(302, target);
+  res.end();
 
 }
