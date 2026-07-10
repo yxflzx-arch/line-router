@@ -1,25 +1,33 @@
 import { Redis } from "@upstash/redis";
 
-const redis = new Redis({
-  url: process.env.KV_REST_API_URL,
-  token: process.env.KV_REST_API_TOKEN,
-});
+const redis = Redis.fromEnv();
 
 export default async function handler(req, res) {
+  try {
+    const lines = [
+      "https://lin.ee/wglznlp",
+      "https://lin.ee/O04FjGr"
+    ];
 
-  const lines = [
-    "https://lin.ee/wglznlp",
-    "https://lin.ee/O04FjGr"
-  ];
+    // Redis 計數
+    const count = await redis.incr("line_count");
 
-  const count = await redis.incr("line_count");
+    // 輪流分流
+    const target = lines[(count - 1) % lines.length];
 
-  const target = lines[count % 2];
+    res.statusCode = 302;
+    res.setHeader("Location", target);
+    res.end();
 
-  res.writeHead(302, {
-    Location: target
-  });
+  } catch (error) {
+    console.error(error);
 
-  res.end();
-
+    // Redis 掛掉時，至少還能跳轉
+    res.statusCode = 302;
+    res.setHeader(
+      "Location",
+      "https://lin.ee/wglznlp"
+    );
+    res.end();
+  }
 }
