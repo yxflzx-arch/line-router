@@ -1,84 +1,32 @@
-import { Redis } from "@upstash/redis";
+export default async function handler(req, res) {
+
+  try {
+
+    const response = await fetch(
+      `${process.env.KV_REST_API_URL}/get/line_count`,
+      {
+        headers: {
+          Authorization:
+          `Bearer ${process.env.KV_REST_API_TOKEN}`
+        }
+      }
+    );
 
 
-const redis=new Redis({
+    const data = await response.json();
 
-url:process.env.KV_REST_API_URL,
-
-token:process.env.KV_REST_API_TOKEN,
-
-});
+    const total = data.result || 0;
 
 
-export default async function handler(req,res){
+    res.setHeader(
+      "Content-Type",
+      "text/html; charset=utf-8"
+    );
 
 
-const total =
-await redis.get(
-"line_total_count"
-)||0;
+    res.end(`
 
-
-const lineA =
-await redis.get(
-"line_a_count"
-)||0;
-
-
-const lineB =
-await redis.get(
-"line_b_count"
-)||0;
-
-
-
-const today =
-new Date()
-.toISOString()
-.slice(0,10);
-
-
-const todayCount =
-await redis.get(
-`today_${today}`
-)||0;
-
-
-
-const logs =
-await redis.lrange(
-"click_logs",
-0,
-9
-);
-
-
-
-const history =
-logs.map(x=>{
-
-const d=JSON.parse(x);
-
-return `
-<li>
-LINE ${d.line}
-｜
-${d.time}
-</li>
-`;
-
-}).join("");
-
-
-
-res.setHeader(
-"Content-Type",
-"text/html;charset=utf-8"
-);
-
-
-
-res.end(`
+<!DOCTYPE html>
 
 <html>
 
@@ -94,30 +42,25 @@ LINE Router Dashboard
 body{
 font-family:Arial;
 padding:40px;
+background:#f7f7f7;
 }
 
 
 .card{
 
-border:1px solid #ddd;
-border-radius:12px;
+background:white;
 padding:25px;
-width:350px;
-margin-bottom:20px;
+border-radius:12px;
+width:300px;
+box-shadow:0 2px 10px #ddd;
 
 }
 
 
-.num{
+.number{
 
-font-size:40px;
-
-}
-
-
-li{
-
-margin:10px 0;
+font-size:48px;
+font-weight:bold;
 
 }
 
@@ -135,66 +78,36 @@ LINE Router Dashboard
 </h1>
 
 
-
 <div class="card">
+
+<p>
 總點擊數
-<div class="num">
+</p>
+
+
+<div class="number">
 ${total}
 </div>
-</div>
 
-
-
-<div class="card">
-今日點擊
-<div class="num">
-${todayCount}
-</div>
-</div>
-
-
-
-
-<div class="card">
-LINE A
-
-<div class="num">
-${lineA}
-</div>
 
 </div>
-
-
-
-<div class="card">
-LINE B
-
-<div class="num">
-${lineB}
-</div>
-
-</div>
-
-
-
-<h2>
-最近點擊
-</h2>
-
-
-<ul>
-
-${history}
-
-</ul>
-
 
 
 </body>
+
 
 </html>
 
 `);
 
+  } catch(error) {
+
+
+    res.status(500).send(
+      "Dashboard Error"
+    );
+
+
+  }
 
 }
