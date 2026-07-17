@@ -2,7 +2,7 @@ export default async function handler(req, res) {
 
   const lines = [
     "https://lin.ee/Z2i35pa",
-    "https://lin.ee/5GgWxE5",
+    "https://lin.ee/NfV096u",
     "https://lin.ee/Rus51pN"
   ];
 
