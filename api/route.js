@@ -2,7 +2,8 @@ export default async function handler(req, res) {
 
   const lines = [
     "https://lin.ee/NYfUBs0",
-    "https://lin.ee/qYecW9U"
+    "https://lin.ee/qYecW9U",
+    "https://lin.ee/Rus51pN"
   ];
 
   try {
@@ -21,22 +22,17 @@ export default async function handler(req, res) {
 
     console.log(data);
 
-
     const count = data.result || 1;
 
-
     const target =
-      lines[(count - 1) % 2];
-
+      lines[(count - 1) % lines.length];
 
     res.writeHead(302, {
       Location: target,
-      "Cache-Control":
-      "no-store"
+      "Cache-Control": "no-store"
     });
 
     res.end();
-
 
   } catch(error) {
 
